@@ -1,9 +1,19 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 from typing import Optional
 
 app = FastAPI()
+
+# CORS設定
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def get_db():
@@ -26,8 +36,8 @@ def get_projects(
     max_supporters: Optional[int] = None,
     category: Optional[str] = None,
     portal: Optional[str] = None,
+    status: Optional[str] = None,
     sort: Optional[str] = "amount_desc",
-    favorites_only: Optional[str] = None,
 ):
     conn = get_db()
     c = conn.cursor()
@@ -44,37 +54,41 @@ def get_projects(
         params.append(f"%{keyword}%")
         params.append(f"%{keyword}%")
 
-    if min_amount:
+    if min_amount is not None:
         query += " AND amount >= ?"
         params.append(min_amount)
 
-    if max_amount:
+    if max_amount is not None:
         query += " AND amount <= ?"
         params.append(max_amount)
 
-    if min_rate:
+    if min_rate is not None:
         query += " AND achievement_rate >= ?"
         params.append(min_rate)
 
-    if max_rate:
+    if max_rate is not None:
         query += " AND achievement_rate <= ?"
         params.append(max_rate)
 
-    if min_supporters:
+    if min_supporters is not None:
         query += " AND supporters >= ?"
         params.append(min_supporters)
 
-    if max_supporters:
+    if max_supporters is not None:
         query += " AND supporters <= ?"
         params.append(max_supporters)
 
     if category:
-        query += " AND category = ?"
-        params.append(category)
+        query += " AND category LIKE ?"
+        params.append(f"%{category}%")
 
     if portal:
         query += " AND portal = ?"
         params.append(portal)
+
+    if status:
+        query += " AND status = ?"
+        params.append(status)
 
     sort_map = {
         "amount_desc": "amount DESC",
@@ -98,7 +112,7 @@ def get_projects(
     projects = c.execute(query, params).fetchall()
     conn.close()
 
-    return {"total": total, "page": page, "projects": [dict(p) for p in projects]}
+    return {"total": total, "page": page, "limit": limit, "projects": [dict(p) for p in projects]}
 
 
 @app.get("/api/stats")
@@ -109,12 +123,14 @@ def get_stats():
     max_amount = c.execute("SELECT MAX(amount) FROM projects").fetchone()[0] or 0
     max_rate = c.execute("SELECT MAX(achievement_rate) FROM projects").fetchone()[0] or 0
     total_amount = c.execute("SELECT SUM(amount) FROM projects").fetchone()[0] or 0
+    avg_supporters = c.execute("SELECT AVG(supporters) FROM projects WHERE supporters > 0").fetchone()[0] or 0
     conn.close()
     return {
         "total_projects": total,
         "max_amount": max_amount,
         "max_rate": max_rate,
         "total_amount": total_amount,
+        "avg_supporters": int(avg_supporters),
     }
 
 
@@ -135,6 +151,17 @@ def get_portals():
     c = conn.cursor()
     rows = c.execute(
         "SELECT portal, COUNT(*) as cnt FROM projects WHERE portal != '' GROUP BY portal ORDER BY cnt DESC"
+    ).fetchall()
+    conn.close()
+    return [{"name": r[0], "count": r[1]} for r in rows]
+
+
+@app.get("/api/statuses")
+def get_statuses():
+    conn = get_db()
+    c = conn.cursor()
+    rows = c.execute(
+        "SELECT status, COUNT(*) as cnt FROM projects WHERE status != '' GROUP BY status ORDER BY cnt DESC"
     ).fetchall()
     conn.close()
     return [{"name": r[0], "count": r[1]} for r in rows]

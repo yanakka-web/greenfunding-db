@@ -3,527 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GREEN FUNDING 終了プロジェクト データベース</title>
+    <title>GREEN FUNDING 終了プロジェクトデータベース</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', 'Hiragino Sans', 'Meiryo', sans-serif; background: #f5f5f5; color: #333; }
-        
-        /* ヘッダー */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
         .header {
-            background: linear-gradient(135deg, #1a8a4a 0%, #0d6e3a 100%);
-            color: white; padding: 14px 24px;
-            display: flex; justify-content: space-between; align-items: center;
-            position: sticky; top: 0; z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            background: #2e7d32;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .header-logo {
-            width: 36px; height: 36px; background: white; border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: #1a8a4a; font-size: 18px;
-        }
-        .header-title { font-size: 16px; font-weight: 600; }
-        .header-stats { display: flex; gap: 20px; font-size: 13px; }
-        .header-stats span { opacity: 0.9; }
-        .header-stats strong { color: #90eeb8; }
 
-        /* メインレイアウト */
-        .main { display: flex; min-height: calc(100vh - 56px); }
-        
-        /* サイドバー */
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .header .stats {
+            font-size: 14px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .container {
+            display: flex;
+            max-width: 1400px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+
         .sidebar {
-            width: 260px; background: white; padding: 16px;
-            border-right: 1px solid #e0e0e0; overflow-y: auto;
-            position: sticky; top: 56px; height: calc(100vh - 56px);
-            flex-shrink: 0;
+            width: 280px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
         }
+
         .sidebar h3 {
-            font-size: 13px; color: #666; margin-bottom: 8px;
-            display: flex; align-items: center; gap: 4px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #333;
         }
-        .sidebar .reset-btn {
-            font-size: 11px; color: #1a8a4a; cursor: pointer;
-            background: #e8f5e9; border: 1px solid #c8e6c9;
-            padding: 2px 8px; border-radius: 10px; margin-left: auto;
+
+        .filter-group {
+            margin-bottom: 25px;
         }
-        .sidebar .reset-btn:hover { background: #c8e6c9; }
-        
-        .filter-group { margin-bottom: 16px; }
-        .filter-group label { font-size: 12px; color: #555; display: block; margin-bottom: 4px; }
-        .filter-group input[type="text"],
-        .filter-group input[type="number"],
+
+        .filter-group label {
+            display: block;
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .filter-group input,
         .filter-group select {
-            width: 100%; padding: 6px 8px; border: 1px solid #ddd;
-            border-radius: 4px; font-size: 13px; outline: none;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
         }
-        .filter-group input:focus, .filter-group select:focus {
-            border-color: #1a8a4a; box-shadow: 0 0 0 2px rgba(26,138,74,0.1);
-        }
-        .range-inputs { display: flex; gap: 4px; align-items: center; }
-        .range-inputs input { width: calc(50% - 10px); }
-        .range-inputs span { color: #999; font-size: 12px; }
 
-        /* タグフィルター */
-        .tag-filters { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-        .tag-filters button {
-            font-size: 11px; padding: 3px 8px; border: 1px solid #ddd;
-            border-radius: 12px; background: white; cursor: pointer;
-            color: #555; transition: all 0.15s;
+        .filter-group .range-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
         }
-        .tag-filters button:hover { border-color: #1a8a4a; color: #1a8a4a; }
-        .tag-filters button.active { background: #1a8a4a; color: white; border-color: #1a8a4a; }
 
-        /* コンテンツエリア */
-        .content { flex: 1; padding: 16px; }
-        .content-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 12px;
+        .filter-group .range-inputs input {
+            width: 100px;
         }
-        .result-count { font-size: 13px; color: #666; }
-        .content-actions { display: flex; gap: 8px; align-items: center; }
-        .sort-select {
-            padding: 6px 10px; border: 1px solid #ddd; border-radius: 4px;
-            font-size: 12px; background: white; cursor: pointer;
-        }
-        .csv-btn {
-            padding: 6px 14px; background: #1a8a4a; color: white;
-            border: none; border-radius: 4px; font-size: 12px;
-            cursor: pointer; font-weight: 600;
-        }
-        .csv-btn:hover { background: #157a3e; }
 
-        /* プロジェクトグリッド */
+        .btn {
+            width: 100%;
+            padding: 10px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: #1b5e20;
+        }
+
+        .btn-reset {
+            background: #757575;
+            margin-top: 10px;
+        }
+
+        .btn-reset:hover {
+            background: #616161;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .results-header {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .results-header .count {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .results-header select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-            gap: 16px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
         }
+
         .project-card {
-            background: white; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             transition: transform 0.2s, box-shadow 0.2s;
-            cursor: pointer; position: relative;
+            cursor: pointer;
         }
+
         .project-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-        .card-image {
-            width: 100%; height: 160px; object-fit: cover;
-            background: #e8e8e8;
-        }
-        .card-image-placeholder {
-            width: 100%; height: 160px; background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-            display: flex; align-items: center; justify-content: center;
-            color: #1a8a4a; font-size: 40px;
-        }
-        .card-body { padding: 12px; }
-        .card-category {
-            display: inline-block; font-size: 10px; color: #1a8a4a;
-            background: #e8f5e9; padding: 2px 6px; border-radius: 3px;
-            margin-bottom: 6px; font-weight: 600;
-        }
-        .card-title {
-            font-size: 13px; font-weight: 600; line-height: 1.4;
-            margin-bottom: 8px; display: -webkit-box;
-            -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+
+        .project-card .image {
+            width: 100%;
+            height: 200px;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
-        .card-amount {
-            font-size: 18px; font-weight: bold; color: #1a8a4a;
-            margin-bottom: 4px;
-        }
-        .card-meta {
-            font-size: 11px; color: #888; display: flex;
-            justify-content: space-between; align-items: center;
-        }
-        .card-rate { color: #e67e22; font-weight: 600; }
-        .card-link {
-            display: inline-block; margin-top: 8px; font-size: 11px;
-            color: #1a8a4a; text-decoration: none;
-        }
-        .card-link:hover { text-decoration: underline; }
-        .card-fav {
-            position: absolute; top: 8px; right: 8px;
-            background: rgba(255,255,255,0.9); border: none;
-            border-radius: 50%; width: 28px; height: 28px;
-            cursor: pointer; font-size: 14px; display: flex;
-            align-items: center; justify-content: center;
-        }
-        .card-fav.active { color: #e74c3c; }
 
-        /* ページネーション */
+        .project-card .image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-card .content {
+            padding: 15px;
+        }
+
+        .project-card .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            font-size: 11px;
+            border-radius: 3px;
+            margin-bottom: 8px;
+        }
+
+        .project-card .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            line-height: 1.4;
+            height: 40px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .project-card .amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #d32f2f;
+            margin-bottom: 5px;
+        }
+
+        .project-card .meta {
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
         .pagination {
-            display: flex; justify-content: center; gap: 6px;
-            margin-top: 24px; flex-wrap: wrap;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            padding: 20px;
         }
+
         .pagination button {
-            padding: 6px 12px; border: 1px solid #ddd; background: white;
-            border-radius: 4px; cursor: pointer; font-size: 13px;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
         }
-        .pagination button.active {
-            background: #1a8a4a; color: white; border-color: #1a8a4a;
+
+        .pagination button:hover:not(:disabled) {
+            background: #f5f5f5;
         }
-        .pagination button:hover:not(.active) { border-color: #1a8a4a; color: #1a8a4a; }
-        .pagination button:disabled { opacity: 0.4; cursor: default; }
 
-        /* 年タグ */
-        .year-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
-        .year-tags button {
-            font-size: 11px; padding: 2px 8px; border: 1px solid #ddd;
-            border-radius: 4px; background: white; cursor: pointer;
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
-        .year-tags button.active { background: #1a8a4a; color: white; border-color: #1a8a4a; }
 
-        /* お気に入りチェックボックス */
-        .fav-filter { margin-top: 12px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
-        .fav-filter input { accent-color: #1a8a4a; }
-
-        /* ローディング */
-        .loading { text-align: center; padding: 40px; color: #888; }
-        .loading .spinner {
-            width: 32px; height: 32px; border: 3px solid #e0e0e0;
-            border-top-color: #1a8a4a; border-radius: 50%;
-            animation: spin 0.8s linear infinite; margin: 0 auto 12px;
+        .pagination .current {
+            padding: 8px 16px;
+            font-weight: 600;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* レスポンシブ */
-        @media (max-width: 768px) {
-            .sidebar { display: none; }
-            .header { flex-direction: column; gap: 8px; }
-            .projects-grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 16px;
+            color: #666;
         }
     </style>
 </head>
 <body>
-
-<div class="header">
-    <div class="header-left">
-        <div class="header-logo">G</div>
-        <span class="header-title">GREEN FUNDING 終了プロジェクト データベース</span>
-    </div>
-    <div class="header-stats">
-        <span>総プロジェクト: <strong id="stat-total">-</strong></span>
-        <span>総額: <strong id="stat-amount">-</strong></span>
-        <span>最高達成率: <strong id="stat-rate">-</strong></span>
-    </div>
-</div>
-
-<div class="main">
-    <div class="sidebar">
-        <h3>絞り込み <button class="reset-btn" onclick="resetFilters()">× リセット</button></h3>
-        
-        <div class="filter-group">
-            <label>タイトルで検索</label>
-            <input type="text" id="filter-title" placeholder="タイトルで検索..." oninput="debounceSearch()">
-        </div>
-
-        <div class="filter-group">
-            <label>応援購入総額（円）</label>
-            <div class="range-inputs">
-                <input type="number" id="filter-min-amount" placeholder="最小" oninput="debounceSearch()">
-                <span>〜</span>
-                <input type="number" id="filter-max-amount" placeholder="最大" oninput="debounceSearch()">
-            </div>
-        </div>
-
-        <div class="filter-group">
-            <label>達成率（%）</label>
-            <div class="range-inputs">
-                <input type="number" id="filter-min-rate" placeholder="最小" oninput="debounceSearch()">
-                <span>〜</span>
-                <input type="number" id="filter-max-rate" placeholder="最大" oninput="debounceSearch()">
-            </div>
-        </div>
-
-        <div class="filter-group">
-            <label>サポーター数</label>
-            <div class="range-inputs">
-                <input type="number" id="filter-min-supporters" placeholder="最小" oninput="debounceSearch()">
-                <span>〜</span>
-                <input type="number" id="filter-max-supporters" placeholder="最大" oninput="debounceSearch()">
-            </div>
-        </div>
-
-        <div class="filter-group">
-            <label>カテゴリ</label>
-            <div id="category-tags" class="tag-filters"></div>
-        </div>
-
-        <div class="fav-filter">
-            <input type="checkbox" id="filter-fav" onchange="loadProjects()">
-            <label for="filter-fav">お気に入りのみ表示</label>
+    <div class="header">
+        <h1>🟢 GREEN FUNDING 終了プロジェクトデータベース</h1>
+        <div class="stats">
+            <span>総プロジェクト: <strong id="total-count">-</strong>件</span>
+            <span>総額: <strong id="total-amount">-</strong>億円</span>
+            <span>最高達成率: <strong id="max-rate">-</strong>%</span>
         </div>
     </div>
 
-    <div class="content">
-        <div class="content-header">
-            <span class="result-count" id="result-count">読み込み中...</span>
-            <div class="content-actions">
-                <select class="sort-select" id="sort-select" onchange="loadProjects()">
+    <div class="container">
+        <div class="sidebar">
+            <h3>絞り込み</h3>
+            
+            <div class="filter-group">
+                <label>タイトル検索</label>
+                <input type="text" id="filter-title" placeholder="キーワードを入力...">
+            </div>
+
+            <div class="filter-group">
+                <label>応援購入金額 (円)</label>
+                <div class="range-inputs">
+                    <input type="number" id="filter-amount-min" placeholder="最小">
+                    <span>〜</span>
+                    <input type="number" id="filter-amount-max" placeholder="最大">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>達成率 (%)</label>
+                <div class="range-inputs">
+                    <input type="number" id="filter-rate-min" placeholder="最小">
+                    <span>〜</span>
+                    <input type="number" id="filter-rate-max" placeholder="最大">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>サポーター数</label>
+                <div class="range-inputs">
+                    <input type="number" id="filter-supporters-min" placeholder="最小">
+                    <span>〜</span>
+                    <input type="number" id="filter-supporters-max" placeholder="最大">
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <label>カテゴリ</label>
+                <select id="filter-category">
+                    <option value="">すべて</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>ポータル</label>
+                <select id="filter-portal">
+                    <option value="">すべて</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>ステータス</label>
+                <select id="filter-status">
+                    <option value="">すべて</option>
+                </select>
+            </div>
+
+            <button class="btn" onclick="applyFilters()">検索</button>
+            <button class="btn btn-reset" onclick="resetFilters()">✕ リセット</button>
+        </div>
+
+        <div class="main-content">
+            <div class="results-header">
+                <div class="count"><span id="result-count">-</span>件中 1〜20件を表示</div>
+                <select id="sort-select" onchange="applyFilters()">
                     <option value="amount_desc">金額が多い順</option>
                     <option value="amount_asc">金額が少ない順</option>
                     <option value="rate_desc">達成率が高い順</option>
+                    <option value="rate_asc">達成率が低い順</option>
                     <option value="supporters_desc">サポーター数が多い順</option>
-                    <option value="newest">新しい順</option>
-                    <option value="oldest">古い順</option>
+                    <option value="supporters_asc">サポーター数が少ない順</option>
                 </select>
-                <button class="csv-btn" onclick="downloadCSV()">CSV</button>
             </div>
-        </div>
 
-        <div id="projects-grid" class="projects-grid">
-            <div class="loading">
-                <div class="spinner"></div>
-                読み込み中...
+            <div class="projects-grid" id="projects-grid">
+                <div class="loading">読み込み中...</div>
             </div>
-        </div>
 
-        <div id="pagination" class="pagination"></div>
+            <div class="pagination" id="pagination"></div>
+        </div>
     </div>
-</div>
 
-<script>
-let currentPage = 1;
-let totalProjects = 0;
-let debounceTimer = null;
-let favorites = JSON.parse(localStorage.getItem('gf_favorites') || '[]');
-let activeCategory = '';
+    <script>
+        let currentPage = 1;
+        let totalPages = 1;
 
-function debounceSearch() {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        currentPage = 1;
-        loadProjects();
-    }, 400);
-}
-
-function getFilters() {
-    const params = new URLSearchParams();
-    params.set('page', currentPage);
-    params.set('limit', 20);
-    params.set('sort', document.getElementById('sort-select').value);
-
-    const title = document.getElementById('filter-title').value.trim();
-    if (title) params.set('title', title);
-
-    const minAmount = document.getElementById('filter-min-amount').value;
-    if (minAmount) params.set('min_amount', minAmount);
-
-    const maxAmount = document.getElementById('filter-max-amount').value;
-    if (maxAmount) params.set('max_amount', maxAmount);
-
-    const minRate = document.getElementById('filter-min-rate').value;
-    if (minRate) params.set('min_rate', minRate);
-
-    const maxRate = document.getElementById('filter-max-rate').value;
-    if (maxRate) params.set('max_rate', maxRate);
-
-    const minSup = document.getElementById('filter-min-supporters').value;
-    if (minSup) params.set('min_supporters', minSup);
-
-    const maxSup = document.getElementById('filter-max-supporters').value;
-    if (maxSup) params.set('max_supporters', maxSup);
-
-    if (activeCategory) params.set('category', activeCategory);
-
-    return params;
-}
-
-async function loadProjects() {
-    const grid = document.getElementById('projects-grid');
-    grid.innerHTML = '<div class="loading"><div class="spinner"></div>読み込み中...</div>';
-
-    const params = getFilters();
-    
-    try {
-        const resp = await fetch(`/api/projects?${params}`);
-        const data = await resp.json();
-        totalProjects = data.total;
-
-        document.getElementById('result-count').textContent =
-            `${totalProjects.toLocaleString()}件中 ${((currentPage-1)*20+1).toLocaleString()}〜${Math.min(currentPage*20, totalProjects).toLocaleString()}件を表示`;
-
-        if (data.projects.length === 0) {
-            grid.innerHTML = '<div class="loading">該当するプロジェクトがありません</div>';
-            document.getElementById('pagination').innerHTML = '';
-            return;
+        // 初期化
+        async function init() {
+            await loadStats();
+            await loadCategories();
+            await loadPortals();
+            await loadStatuses();
+            await loadProjects();
         }
 
-        const favOnly = document.getElementById('filter-fav').checked;
-        let projects = data.projects;
-        if (favOnly) {
-            projects = projects.filter(p => favorites.includes(p.project_id));
+        // 統計情報を取得
+        async function loadStats() {
+            const res = await fetch('/api/stats');
+            const stats = await res.json();
+            document.getElementById('total-count').textContent = stats.total_projects.toLocaleString();
+            document.getElementById('total-amount').textContent = (stats.total_amount / 100000000).toFixed(1);
+            document.getElementById('max-rate').textContent = stats.max_rate.toLocaleString();
         }
 
-        grid.innerHTML = projects.map(p => {
-            const isFav = favorites.includes(p.project_id);
-            const imgHtml = p.image_url
-                ? `<img class="card-image" src="${p.image_url}" alt="" loading="lazy" onerror="this.outerHTML='<div class=card-image-placeholder>🌱</div>'">`
-                : '<div class="card-image-placeholder">🌱</div>';
-            
-            return `
-                <div class="project-card" onclick="if(event.target.classList.contains('card-fav'))return; window.open('${p.url}','_blank')">
-                    <button class="card-fav ${isFav?'active':''}" onclick="toggleFav('${p.project_id}',this)">
-                        ${isFav ? '★' : '☆'}
-                    </button>
-                    ${imgHtml}
-                    <div class="card-body">
-                        ${p.category ? `<span class="card-category">${p.category}</span>` : '<span class="card-category">プロダクト</span>'}
-                        <div class="card-title">${escapeHtml(p.title)}</div>
-                        <div class="card-amount">¥${(p.amount||0).toLocaleString()}</div>
-                        <div class="card-meta">
-                            <span>サポーター: ${(p.supporters||0).toLocaleString()}人</span>
-                            <span class="card-rate">${(p.achievement_rate||0).toLocaleString()}%達成</span>
-                        </div>
-                        <a class="card-link" href="${p.url}" target="_blank" onclick="event.stopPropagation()">GREEN FUNDINGで見る →</a>
+        // カテゴリを取得
+        async function loadCategories() {
+            const res = await fetch('/api/categories');
+            const categories = await res.json();
+            const select = document.getElementById('filter-category');
+            categories.forEach(cat => {
+                const option = document.createElement('option');
+                option.value = cat.name;
+                option.textContent = `${cat.name} (${cat.count})`;
+                select.appendChild(option);
+            });
+        }
+
+        // ポータルを取得
+        async function loadPortals() {
+            const res = await fetch('/api/portals');
+            const portals = await res.json();
+            const select = document.getElementById('filter-portal');
+            portals.forEach(portal => {
+                const option = document.createElement('option');
+                option.value = portal.name;
+                option.textContent = `${portal.name} (${portal.count})`;
+                select.appendChild(option);
+            });
+        }
+
+        // ステータスを取得
+        async function loadStatuses() {
+            const res = await fetch('/api/statuses');
+            const statuses = await res.json();
+            const select = document.getElementById('filter-status');
+            statuses.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status.name;
+                option.textContent = `${status.name} (${status.count})`;
+                select.appendChild(option);
+            });
+        }
+
+        // プロジェクトを取得
+        async function loadProjects() {
+            const params = new URLSearchParams({
+                page: currentPage,
+                limit: 20,
+                sort: document.getElementById('sort-select').value
+            });
+
+            const title = document.getElementById('filter-title').value;
+            if (title) params.append('title', title);
+
+            const minAmount = document.getElementById('filter-amount-min').value;
+            if (minAmount) params.append('min_amount', minAmount);
+
+            const maxAmount = document.getElementById('filter-amount-max').value;
+            if (maxAmount) params.append('max_amount', maxAmount);
+
+            const minRate = document.getElementById('filter-rate-min').value;
+            if (minRate) params.append('min_rate', minRate);
+
+            const maxRate = document.getElementById('filter-rate-max').value;
+            if (maxRate) params.append('max_rate', maxRate);
+
+            const minSupporters = document.getElementById('filter-supporters-min').value;
+            if (minSupporters) params.append('min_supporters', minSupporters);
+
+            const maxSupporters = document.getElementById('filter-supporters-max').value;
+            if (maxSupporters) params.append('max_supporters', maxSupporters);
+
+            const category = document.getElementById('filter-category').value;
+            if (category) params.append('category', category);
+
+            const portal = document.getElementById('filter-portal').value;
+            if (portal) params.append('portal', portal);
+
+            const status = document.getElementById('filter-status').value;
+            if (status) params.append('status', status);
+
+            const res = await fetch(`/api/projects?${params}`);
+            const data = await res.json();
+
+            displayProjects(data.projects);
+            updatePagination(data.total, data.page, data.limit);
+            document.getElementById('result-count').textContent = data.total.toLocaleString();
+        }
+
+        // プロジェクトを表示
+        function displayProjects(projects) {
+            const grid = document.getElementById('projects-grid');
+            grid.innerHTML = '';
+
+            projects.forEach(project => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.onclick = () => window.open(project.url, '_blank');
+
+                card.innerHTML = `
+                    <div class="image">
+                        ${project.image_url ? `<img src="${project.image_url}" alt="${project.title}">` : '<span>画像なし</span>'}
                     </div>
-                </div>
-            `;
-        }).join('');
+                    <div class="content">
+                        <span class="badge">${project.category || 'カテゴリなし'}</span>
+                        <div class="title">${project.title}</div>
+                        <div class="amount">¥${(project.amount || 0).toLocaleString()}</div>
+                        <div class="meta">
+                            <span>応援購入人数: ${(project.supporters || 0).toLocaleString()}人</span>
+                            <span>${(project.achievement_rate || 0).toLocaleString()}%達成</span>
+                        </div>
+                    </div>
+                `;
 
-        renderPagination();
-    } catch (err) {
-        grid.innerHTML = '<div class="loading">エラーが発生しました。再読み込みしてください。</div>';
-        console.error(err);
-    }
-}
+                grid.appendChild(card);
+            });
+        }
 
-function renderPagination() {
-    const totalPages = Math.ceil(totalProjects / 20);
-    const pag = document.getElementById('pagination');
-    
-    if (totalPages <= 1) { pag.innerHTML = ''; return; }
+        // ページネーション更新
+        function updatePagination(total, page, limit) {
+            totalPages = Math.ceil(total / limit);
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
 
-    let html = '';
-    html += `<button ${currentPage===1?'disabled':''} onclick="goPage(${currentPage-1})">← 前</button>`;
-    
-    const range = 3;
-    let start = Math.max(1, currentPage - range);
-    let end = Math.min(totalPages, currentPage + range);
-    
-    if (start > 1) {
-        html += `<button onclick="goPage(1)">1</button>`;
-        if (start > 2) html += `<button disabled>...</button>`;
-    }
-    
-    for (let i = start; i <= end; i++) {
-        html += `<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
-    }
-    
-    if (end < totalPages) {
-        if (end < totalPages - 1) html += `<button disabled>...</button>`;
-        html += `<button onclick="goPage(${totalPages})">${totalPages}</button>`;
-    }
-    
-    html += `<button ${currentPage===totalPages?'disabled':''} onclick="goPage(${currentPage+1})">次 →</button>`;
-    pag.innerHTML = html;
-}
+            const prevBtn = document.createElement('button');
+            prevBtn.textContent = '← 前へ';
+            prevBtn.disabled = page === 1;
+            prevBtn.onclick = () => {
+                currentPage--;
+                loadProjects();
+            };
+            pagination.appendChild(prevBtn);
 
-function goPage(p) {
-    currentPage = p;
-    loadProjects();
-    window.scrollTo(0, 0);
-}
+            const current = document.createElement('span');
+            current.className = 'current';
+            current.textContent = `${page} / ${totalPages}`;
+            pagination.appendChild(current);
 
-function toggleFav(id, btn) {
-    const idx = favorites.indexOf(id);
-    if (idx >= 0) {
-        favorites.splice(idx, 1);
-        btn.classList.remove('active');
-        btn.textContent = '☆';
-    } else {
-        favorites.push(id);
-        btn.classList.add('active');
-        btn.textContent = '★';
-    }
-    localStorage.setItem('gf_favorites', JSON.stringify(favorites));
-}
+            const nextBtn = document.createElement('button');
+            nextBtn.textContent = '次へ →';
+            nextBtn.disabled = page >= totalPages;
+            nextBtn.onclick = () => {
+                currentPage++;
+                loadProjects();
+            };
+            pagination.appendChild(nextBtn);
+        }
 
-function resetFilters() {
-    document.getElementById('filter-title').value = '';
-    document.getElementById('filter-min-amount').value = '';
-    document.getElementById('filter-max-amount').value = '';
-    document.getElementById('filter-min-rate').value = '';
-    document.getElementById('filter-max-rate').value = '';
-    document.getElementById('filter-min-supporters').value = '';
-    document.getElementById('filter-max-supporters').value = '';
-    document.getElementById('filter-fav').checked = false;
-    activeCategory = '';
-    document.querySelectorAll('.tag-filters button').forEach(b => b.classList.remove('active'));
-    currentPage = 1;
-    loadProjects();
-}
+        // フィルター適用
+        function applyFilters() {
+            currentPage = 1;
+            loadProjects();
+        }
 
-function setCategory(cat, btn) {
-    if (activeCategory === cat) {
-        activeCategory = '';
-        btn.classList.remove('active');
-    } else {
-        activeCategory = cat;
-        document.querySelectorAll('#category-tags button').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-    currentPage = 1;
-    loadProjects();
-}
+        // フィルターリセット
+        function resetFilters() {
+            document.getElementById('filter-title').value = '';
+            document.getElementById('filter-amount-min').value = '';
+            document.getElementById('filter-amount-max').value = '';
+            document.getElementById('filter-rate-min').value = '';
+            document.getElementById('filter-rate-max').value = '';
+            document.getElementById('filter-supporters-min').value = '';
+            document.getElementById('filter-supporters-max').value = '';
+            document.getElementById('filter-category').value = '';
+            document.getElementById('filter-portal').value = '';
+            document.getElementById('filter-status').value = '';
+            document.getElementById('sort-select').value = 'amount_desc';
+            applyFilters();
+        }
 
-async function loadStats() {
-    try {
-        const resp = await fetch('/api/stats');
-        const data = await resp.json();
-        document.getElementById('stat-total').textContent = (data.total_projects||0).toLocaleString() + '件';
-        document.getElementById('stat-amount').textContent = '¥' + Math.floor((data.total_amount||0)/100000000).toLocaleString() + '億';
-        document.getElementById('stat-rate').textContent = (data.max_rate||0).toLocaleString() + '%';
-    } catch(e) { console.error(e); }
-}
-
-async function loadCategories() {
-    try {
-        const resp = await fetch('/api/categories');
-        const cats = await resp.json();
-        const container = document.getElementById('category-tags');
-        container.innerHTML = cats.map(c => 
-            `<button onclick="setCategory('${c.name}',this)">${c.name}</button>`
-        ).join('');
-    } catch(e) { console.error(e); }
-}
-
-async function downloadCSV() {
-    const params = getFilters();
-    params.set('limit', 50000);
-    params.set('page', 1);
-    
-    try {
-        const resp = await fetch(`/api/projects?${params}`);
-        const data = await resp.json();
-        
-        let csv = '\ufeff' + 'タイトル,金額,達成率,サポーター数,カテゴリ,URL\n';
-        data.projects.forEach(p => {
-            csv += `"${(p.title||'').replace(/"/g,'""')}",${p.amount||0},${p.achievement_rate||0},${p.supporters||0},"${p.category||''}","${p.url||''}"\n`;
-        });
-        
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'greenfunding_projects.csv';
-        link.click();
-    } catch(e) {
-        alert('CSVダウンロードに失敗しました');
-    }
-}
-
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
-// 初期化
-loadStats();
-loadCategories();
-loadProjects();
-</script>
+        init();
+    </script>
 </body>
 </html>
